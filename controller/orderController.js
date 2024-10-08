@@ -9,7 +9,7 @@ exports.createOrder = async (req, res) => {
             total,
             status: status || 'pending'
         });
-        const savedOrder = await newOrder.save();
+        const savedOrder = await newOrder.save(); 
         res.status(201).json(savedOrder);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -48,16 +48,11 @@ exports.getYourOrders = async (req, res) => {
     }
 };
 
-// get the count of orders for the current user
-exports.getOrderCount = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const orderCount = await orderModel.countDocuments({ user: userId });
-        res.status(200).json({ success: true, orderCount });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    } 
-};
+
+
+
+
+
 
 
 
@@ -136,7 +131,7 @@ exports.saveOrderDetails = async (req, res) => {
 
         const { cartData, contactInfo, paymentIntentId, status } = req.body;
 
-        console.log('Received Data:', req.body);
+        // console.log('Received Data:', req.body);
 
         if (!cartData || !contactInfo || !paymentIntentId) {
             return res.status(400).json({ message: 'Missing required data' });
@@ -184,6 +179,19 @@ exports.getSingleOrder = async (req, res) => {
         const orderInfo = await UserAllData.find({ user: userId }).populate({ path: 'user', select: '-password' });
         res.status(200).json({ success: true, message: 'Order information retrieved successfully', orderInfo });
     } catch (error) {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+
+exports.getOrderCount = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const orderCount = await UserAllData.countDocuments({ user: userId });
+        console.log('Order Count:', orderCount); // Log the count
+        res.status(200).json({ success: true, orderCount });
+    } catch (error) {
+        console.error('Error fetching order count:', error); // Log any errors
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
