@@ -129,7 +129,7 @@ exports.saveOrderDetails = async (req, res) => {
             return res.status(401).json({ message: 'User not authenticated' });
         }
 
-        const { cartData, contactInfo, paymentIntentId, status } = req.body;
+        const { cartData, contactInfo, paymentIntentId, status,totalPrice } = req.body;
 
         // console.log('Received Data:', req.body);
 
@@ -142,6 +142,7 @@ exports.saveOrderDetails = async (req, res) => {
             contactData: contactInfo,
             packageData: { paymentIntentId },
             user: req.user._id,
+            totalPrice,
             status: status || 'pending',
         });
 
@@ -173,18 +174,6 @@ exports.getSingleOrder = async (req, res) => {
 
 
 //get all user data
-//   exports.getAllUserOrderData = async (req, res) => {
-//     try {
-//         const userId = req.user._id;
-//         const orderInfo = await UserAllData.find({ user: userId }).populate({ path: 'user', select: '-password' });
-//         res.status(200).json({ success: true, message: 'Order information retrieved successfully', orderInfo });
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: 'Internal server error' });
-//     }
-// };
-
-
-
 exports.getAllUserOrderData = async (req, res) => {
     try {
         // Fetch all orders without filtering by user
@@ -243,6 +232,33 @@ exports.updateOrderStatus = async (req, res) => {
     }
 };
 
+
+
+
+
+//admin data
+
+
+exports.getTotalSales = async (req, res) => {
+    try {
+        const totalSales = await UserAllData.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: "$totalPrice" }  // Sum the totalPrice field
+                }
+            }
+        ]);
+
+        // Get the total sales value; it will be in an array
+        const totalAmount = totalSales[0] ? totalSales[0].total : 0;
+
+        res.status(200).json({ totalSales: totalAmount });
+    } catch (error) {
+        console.error('Error calculating total sales:', error);
+        res.status(500).json({ message: 'Internal server error', error });
+    }
+};
 
 
 
