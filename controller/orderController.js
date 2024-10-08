@@ -173,15 +173,36 @@ exports.getSingleOrder = async (req, res) => {
 
 
 //get all user data
-  exports.getAllUserOrderData = async (req, res) => {
+//   exports.getAllUserOrderData = async (req, res) => {
+//     try {
+//         const userId = req.user._id;
+//         const orderInfo = await UserAllData.find({ user: userId }).populate({ path: 'user', select: '-password' });
+//         res.status(200).json({ success: true, message: 'Order information retrieved successfully', orderInfo });
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: 'Internal server error' });
+//     }
+// };
+
+
+
+exports.getAllUserOrderData = async (req, res) => {
     try {
-        const userId = req.user._id;
-        const orderInfo = await UserAllData.find({ user: userId }).populate({ path: 'user', select: '-password' });
+        // Fetch all orders without filtering by user
+        const orderInfo = await UserAllData.find()
+            .populate({ path: 'user', select: '-password' }); // Populate user info, excluding password
+
+        // Check if there are any orders
+        if (orderInfo.length === 0) {
+            return res.status(404).json({ success: false, message: 'No orders found.' });
+        }
+
         res.status(200).json({ success: true, message: 'Order information retrieved successfully', orderInfo });
     } catch (error) {
+        console.error('Error retrieving all order data:', error); // Log the error for debugging
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
 
 
 exports.getOrderCount = async (req, res) => {
