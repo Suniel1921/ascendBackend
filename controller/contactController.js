@@ -201,8 +201,6 @@ exports.getAllCompanyInfo = async (req, res) => {
 // controllers/userContactController.js
 
 const ContactInfoModel = require('../models/userContactInfoModal');
-// controllers/userContactController.js
-// const ContactInfoModel = require('../models/ContactInfo');
 
 exports.userContactinfoController = async (req, res) => {
   try {
